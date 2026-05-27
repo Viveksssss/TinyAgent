@@ -1,14 +1,14 @@
 import ast
 import inspect
-import re
 import os
-from string import Template
-from typing import List, Callable, Tuple
 import platform
+import re
+from string import Template
+from typing import Callable, List, Tuple
 
 import click
-from dotenv import load_dotenv
 from anthropic import Anthropic
+from dotenv import load_dotenv
 
 from prompt_template import react_system_prompt_template
 
@@ -67,7 +67,7 @@ class ReActAgent:
             tool_name, args = self.parse_action(action)
 
             # 显示行动
-            args_str = ', '.join([repr(arg) for arg in args])
+            args_str = ", ".join([repr(arg) for arg in args])
             print(f"\n🔧 执行操作: {tool_name}({args_str})")
             print("-" * 30)
 
@@ -207,10 +207,13 @@ class ReActAgent:
         print("⏳ 正在与AI模型交互中，请稍候...")
         try:
             response = self.client.messages.create(
-                model=self.model, max_tokens=1024, messages=messages, system=system_prompt
+                model=self.model,
+                max_tokens=1024,
+                messages=messages,
+                system=system_prompt,
             )
             # 处理不同的响应类型
-            if hasattr(response.content[0], 'text'):
+            if hasattr(response.content[0], "text"):
                 content = response.content[0].text
             else:
                 content = str(response.content[0])
@@ -252,19 +255,63 @@ def search_files(directory: str, pattern: str) -> List[str]:
 
 
 def run_terminal_command(command):
-    import subprocess
     import shlex
     import shutil
+    import subprocess
 
     # 允许的安全命令列表（根据需要扩展）
     ALLOWED_COMMANDS = {
-        'ls', 'pwd', 'cd', 'cat', 'head', 'tail', 'grep', 'find',
-        'echo', 'mkdir', 'rmdir', 'cp', 'mv', 'wc', 'sort', 'uniq',
-        'chmod', 'chown', 'ps', 'kill', 'pkill', 'which', 'where',
-        'date', 'cal', 'df', 'du', 'free', 'top', 'htop', 'man',
-        'python', 'python3', 'pip', 'git', 'ssh', 'scp', 'rsync',
-        'curl', 'wget', 'tar', 'gzip', 'zip', 'unzip', 'ssh',
-        'ping', 'netstat', 'ss', 'lsof', 'file', 'stat'
+        "ls",
+        "pwd",
+        "cd",
+        "cat",
+        "head",
+        "tail",
+        "grep",
+        "find",
+        "echo",
+        "mkdir",
+        "rmdir",
+        "cp",
+        "mv",
+        "wc",
+        "sort",
+        "uniq",
+        "chmod",
+        "chown",
+        "ps",
+        "kill",
+        "pkill",
+        "which",
+        "where",
+        "date",
+        "cal",
+        "df",
+        "du",
+        "free",
+        "top",
+        "htop",
+        "man",
+        "python",
+        "python3",
+        "pip",
+        "git",
+        "ssh",
+        "scp",
+        "rsync",
+        "curl",
+        "wget",
+        "tar",
+        "gzip",
+        "zip",
+        "unzip",
+        "ssh",
+        "ping",
+        "netstat",
+        "ss",
+        "lsof",
+        "file",
+        "stat",
     }
 
     # 白名单检查 - 只允许特定的命令
@@ -274,19 +321,19 @@ def run_terminal_command(command):
         if not cmd_parts:
             return "错误：空命令"
 
-        base_cmd = cmd_parts[0].split('/')[0]  # 获取基础命令名
+        base_cmd = cmd_parts[0].split("/")[0]  # 获取基础命令名
 
         # 检查是否在白名单中
         if base_cmd not in ALLOWED_COMMANDS:
             return f"错误：命令 '{base_cmd}' 不在允许列表中"
 
         # 对于 cd 命令，需要特殊处理
-        if base_cmd == 'cd':
+        if base_cmd == "cd":
             if len(cmd_parts) != 2:
                 return "错误：cd 命令需要一个参数"
             target_path = cmd_parts[1]
             # 只允许相对路径或特定的绝对路径
-            if target_path.startswith('/') and '/..' in target_path:
+            if target_path.startswith("/") and "/.." in target_path:
                 return "错误：不允许访问父目录"
             try:
                 os.chdir(target_path)
@@ -308,7 +355,7 @@ def run_terminal_command(command):
             timeout=30,
             capture_output=True,
             text=True,
-            cwd=os.getcwd()  # 使用当前工作目录
+            cwd=os.getcwd(),  # 使用当前工作目录
         )
 
         if result.returncode == 0:
